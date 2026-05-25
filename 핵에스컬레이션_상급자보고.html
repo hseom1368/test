@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>핵 에스컬레이션 단계 평가 방법론 — 상급자 보고</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body {
+  font-family: 'Malgun Gothic', '맑은 고딕', 'Segoe UI', Tahoma, sans-serif;
+  background: #0a1426;
+  color: #e8eaf6;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+.layout { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 280px;
+  background: linear-gradient(180deg, #0d1b30 0%, #0a1426 100%);
+  padding: 24px 16px;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid rgba(79, 195, 247, 0.15);
+  z-index: 100;
+}
+.sidebar-title { font-size: 13px; color: #4fc3f7; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+.sidebar-subtitle { font-size: 11px; color: #78909c; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(79, 195, 247, 0.1); }
+.nav-section { font-size: 10px; color: #607d8b; text-transform: uppercase; letter-spacing: 1.5px; margin: 18px 0 8px 12px; }
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; margin: 2px 0;
+  color: #b0bec5; text-decoration: none; font-size: 13px;
+  border-radius: 6px; border-left: 3px solid transparent;
+  transition: all 0.2s; cursor: pointer;
+}
+.nav-item:hover { background: rgba(79, 195, 247, 0.08); color: #4fc3f7; border-left-color: rgba(79, 195, 247, 0.5); }
+.nav-item.active { background: rgba(79, 195, 247, 0.12); color: #4fc3f7; border-left-color: #4fc3f7; font-weight: 600; }
+.nav-item .nav-num { display: inline-block; width: 24px; color: #607d8b; font-size: 11px; }
+
+.main { margin-left: 280px; padding: 0; width: calc(100% - 280px); max-width: calc(100% - 280px); }
+
+.section { padding: 64px 56px; max-width: 1280px; margin: 0 auto; border-bottom: 1px solid rgba(79, 195, 247, 0.06); }
+.section h2 { font-size: 30px; color: #ffffff; margin-bottom: 8px; font-weight: 700; letter-spacing: -0.5px; }
+.section h2 .sec-num { color: #4fc3f7; font-weight: 400; margin-right: 14px; }
+.section h3 { font-size: 21px; color: #ffb74d; margin: 32px 0 14px; font-weight: 600; }
+.section h4 { font-size: 16px; color: #aed581; margin: 22px 0 10px; font-weight: 600; }
+.section p { margin-bottom: 14px; color: #cfd8dc; font-size: 15px; }
+.section .lead {
+  font-size: 16px; color: #b3e5fc;
+  padding: 14px 18px;
+  background: rgba(79, 195, 247, 0.04);
+  border-left: 3px solid #4fc3f7;
+  border-radius: 0 6px 6px 0;
+  margin: 18px 0 28px;
+}
+
+/* 표지 */
+.cover {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; padding: 80px 56px;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(79, 195, 247, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(174, 213, 129, 0.05) 0%, transparent 50%),
+    linear-gradient(135deg, #0a1426 0%, #0d1b30 100%);
+}
+.cover-badge {
+  display: inline-block; background: rgba(174, 213, 129, 0.12); color: #aed581;
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px;
+  border: 1px solid rgba(174, 213, 129, 0.3); width: fit-content;
+}
+.cover h1 { font-size: 44px; color: #ffffff; font-weight: 800; line-height: 1.25; margin-bottom: 18px; letter-spacing: -1px; max-width: 1000px; }
+.cover .subtitle { font-size: 19px; color: #b3e5fc; margin-bottom: 40px; max-width: 900px; line-height: 1.5; }
+.cover-meta { display: flex; gap: 16px; margin-top: 40px; flex-wrap: wrap; }
+.cover-meta-item {
+  background: rgba(255, 255, 255, 0.03); padding: 14px 22px;
+  border-radius: 8px; border-left: 3px solid #4fc3f7;
+}
+.cover-meta-item .label { font-size: 11px; color: #78909c; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.cover-meta-item .value { font-size: 15px; color: #ffffff; font-weight: 600; }
+
+/* Executive Summary 박스 */
+.exec-summary {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.08) 0%, rgba(174, 213, 129, 0.04) 100%);
+  border: 1px solid rgba(79, 195, 247, 0.25);
+  border-radius: 12px;
+  padding: 32px 36px;
+  margin: 28px 0;
+}
+.exec-label {
+  display: inline-block;
+  background: #4fc3f7; color: #0a1426;
+  padding: 5px 14px; border-radius: 14px;
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.exec-summary h3 { color: #ffffff; font-size: 22px; margin: 0 0 18px; }
+.exec-bullet {
+  padding: 12px 18px;
+  background: rgba(0, 0, 0, 0.2);
+  border-left: 3px solid #4fc3f7;
+  margin: 10px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 15px;
+  color: #e8eaf6;
+}
+.exec-bullet strong { color: #ffb74d; }
+
+/* 핵심 권고 박스 */
+.recommendation {
+  background: linear-gradient(145deg, rgba(255, 152, 0, 0.06) 0%, rgba(255, 152, 0, 0.02) 100%);
+  border: 1px solid rgba(255, 152, 0, 0.25);
+  border-left: 4px solid #ffb74d;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 16px 0;
+}
+.rec-num {
+  display: inline-block;
+  background: #ffb74d; color: #0a1426;
+  width: 30px; height: 30px;
+  border-radius: 50%; text-align: center; line-height: 30px;
+  font-weight: 800; font-size: 14px;
+  margin-right: 12px;
+  vertical-align: middle;
+}
+.recommendation h4 {
+  display: inline-block;
+  color: #ffb74d; font-size: 17px; margin: 0;
+  vertical-align: middle;
+}
+.rec-decision {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(239, 83, 80, 0.08);
+  border-left: 3px solid #ef5350;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+  color: #ffcdd2;
+}
+.rec-decision strong { color: #ef9a9a; }
+.rec-detail { margin: 12px 0 4px; color: #cfd8dc; font-size: 14px; line-height: 1.7; }
+
+/* 카드 그리드 */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin: 24px 0; }
+.card {
+  background: linear-gradient(145deg, #142847 0%, #1a2e4a 100%);
+  padding: 22px; border-radius: 10px;
+  border: 1px solid rgba(79, 195, 247, 0.1);
+  transition: all 0.3s;
+}
+.card:hover { transform: translateY(-3px); border-color: rgba(79, 195, 247, 0.4); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3); }
+.card-tag { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 12px; background: rgba(79, 195, 247, 0.15); color: #4fc3f7; margin-bottom: 10px; letter-spacing: 0.5px; }
+.card-title { font-size: 17px; color: #ffffff; font-weight: 700; margin-bottom: 10px; }
+.card-desc { font-size: 14px; color: #b0bec5; line-height: 1.6; }
+
+/* 표 */
+table { width: 100%; border-collapse: collapse; margin: 18px 0; background: rgba(20, 40, 71, 0.4); border-radius: 8px; overflow: hidden; font-size: 14px; }
+table th { background: rgba(79, 195, 247, 0.15); color: #4fc3f7; padding: 12px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid rgba(79, 195, 247, 0.3); }
+table td { padding: 11px 14px; color: #cfd8dc; border-bottom: 1px solid rgba(79, 195, 247, 0.06); }
+table tr:hover td { background: rgba(79, 195, 247, 0.03); }
+table strong { color: #ffb74d; }
+
+/* KPI 카드 */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 24px 0; }
+.kpi-card {
+  background: linear-gradient(145deg, #142847 0%, #1a2e4a 100%);
+  padding: 22px 18px; border-radius: 10px;
+  border: 1px solid rgba(79, 195, 247, 0.15);
+  text-align: center;
+  transition: all 0.3s;
+}
+.kpi-card:hover { border-color: rgba(79, 195, 247, 0.4); }
+.kpi-card .kpi-num { font-size: 36px; color: #4fc3f7; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+.kpi-card .kpi-label { font-size: 12px; color: #b0bec5; text-transform: uppercase; letter-spacing: 1px; }
+.kpi-card .kpi-sub { font-size: 11px; color: #607d8b; margin-top: 4px; }
+
+/* 위험·한계 박스 */
+.risk-box {
+  background: rgba(239, 83, 80, 0.06);
+  border: 1px solid rgba(239, 83, 80, 0.25);
+  border-left: 4px solid #ef5350;
+  border-radius: 6px;
+  padding: 16px 22px;
+  margin: 16px 0;
+}
+.risk-box .risk-label { color: #ef9a9a; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+.risk-box h4 { color: #ffcdd2; margin: 0 0 8px; font-size: 15px; }
+.risk-box p { color: #ffcdd2; font-size: 13px; margin: 0; line-height: 1.7; }
+
+/* 정정 강조 */
+.correction-box {
+  background: rgba(174, 213, 129, 0.05);
+  border-left: 3px solid #aed581;
+  padding: 12px 18px;
+  margin: 14px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: #c5e1a5;
+}
+.correction-box .corr-label { color: #aed581; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-right: 8px; }
+
+/* 인용 */
+.citation {
+  font-size: 12px; color: #90a4ae;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 10px 14px;
+  border-left: 2px solid rgba(176, 190, 197, 0.3);
+  margin: 12px 0;
+  border-radius: 0 4px 4px 0;
+  line-height: 1.6;
+}
+.citation strong { color: #b0bec5; }
+
+/* 시나리오 요약 카드 */
+.scenario-summary {
+  display: grid; grid-template-columns: 80px 1fr 280px;
+  gap: 0;
+  background: linear-gradient(145deg, #142847 0%, #1a2e4a 100%);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 18px 0;
+  border: 1px solid rgba(79, 195, 247, 0.15);
+  transition: all 0.3s;
+}
+.scenario-summary:hover { border-color: rgba(79, 195, 247, 0.4); }
+.scenario-summary .ss-num {
+  background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+  color: #0a1426;
+  font-size: 48px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.scenario-summary .ss-body { padding: 20px 24px; }
+.scenario-summary .ss-title { font-size: 18px; color: #ffffff; font-weight: 700; margin-bottom: 6px; }
+.scenario-summary .ss-method { font-size: 13px; color: #aed581; margin-bottom: 10px; }
+.scenario-summary .ss-desc { font-size: 14px; color: #cfd8dc; line-height: 1.6; }
+.scenario-summary .ss-output {
+  background: rgba(79, 195, 247, 0.08);
+  padding: 20px 24px;
+  border-left: 1px solid rgba(79, 195, 247, 0.15);
+}
+.scenario-summary .ss-output-label {
+  font-size: 10px; color: #4fc3f7;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 6px; font-weight: 700;
+}
+.scenario-summary .ss-output-val { font-size: 14px; color: #b3e5fc; }
+
+/* 타임라인 */
+.timeline {
+  margin: 24px 0;
+  border-left: 2px solid rgba(79, 195, 247, 0.3);
+  padding-left: 24px;
+  position: relative;
+}
+.timeline-item {
+  position: relative;
+  padding: 12px 0 24px;
+}
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -32px; top: 18px;
+  width: 12px; height: 12px;
+  background: #4fc3f7;
+  border-radius: 50%;
+  border: 3px solid #0a1426;
+}
+.timeline-period { font-size: 11px; color: #4fc3f7; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+.timeline-title { font-size: 16px; color: #ffffff; font-weight: 600; margin: 4px 0 8px; }
+.timeline-desc { font-size: 14px; color: #b0bec5; line-height: 1.6; }
+
+/* 코드 */
+pre {
+  background: rgba(13, 27, 48, 0.8);
+  border: 1px solid rgba(79, 195, 247, 0.15);
+  padding: 16px 20px; border-radius: 8px; font-size: 13px;
+  color: #b3e5fc; overflow-x: auto; margin: 16px 0;
+  font-family: 'Consolas', 'Monaco', monospace;
+  line-height: 1.6;
+}
+
+/* 약어 툴팁 (report_v2.5.1 차용) */
+abbr.term {
+  border-bottom: 1px dotted #4fc3f7;
+  cursor: help;
+  text-decoration: none;
+  color: inherit;
+  padding-bottom: 1px;
+}
+abbr.term:hover { color: #4fc3f7; }
+.abbr-tooltip {
+  position: fixed !important;
+  z-index: 99999 !important;
+  background: linear-gradient(145deg, #142847 0%, #0d1b30 100%);
+  color: #e8eaf6;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 360px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(79, 195, 247, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.abbr-tooltip.visible { opacity: 1; }
+.abbr-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: -7px; left: 50%; transform: translateX(-50%);
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid rgba(79, 195, 247, 0.4);
+}
+.abbr-tooltip.below::after {
+  top: -7px; bottom: auto;
+  border-top: none;
+  border-bottom: 7px solid rgba(79, 195, 247, 0.4);
+}
+
+/* 약어 사전 표 */
+.glossary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0;
+  font-size: 13px;
+}
+.glossary-table th {
+  background: rgba(79, 195, 247, 0.15);
+  color: #4fc3f7;
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.glossary-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(79, 195, 247, 0.06);
+  color: #cfd8dc;
+  vertical-align: top;
+}
+.glossary-table tr:hover { background: rgba(79, 195, 247, 0.03); }
+.glossary-table .term-abbr {
+  color: #4fc3f7;
+  font-weight: 700;
+  font-family: 'Consolas', monospace;
+  white-space: nowrap;
+  width: 140px;
+}
+.glossary-table .term-full {
+  color: #b3e5fc;
+  font-size: 12px;
+  width: 280px;
+}
+.glossary-table .term-meaning { color: #cfd8dc; line-height: 1.6; }
+.glossary-table .term-cat {
+  color: #aed581;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  width: 90px;
+}
+
+/* 약어 사전 컨트롤 */
+.glossary-search {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(13, 27, 48, 0.6);
+  border: 1px solid rgba(79, 195, 247, 0.25);
+  border-radius: 6px;
+  color: #e8eaf6;
+  font-size: 14px;
+  font-family: inherit;
+  margin: 14px 0;
+}
+.glossary-search:focus { outline: none; border-color: #4fc3f7; }
+.glossary-search::placeholder { color: #607d8b; }
+
+.glossary-cat-filter {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin: 14px 0;
+}
+.cat-btn {
+  background: rgba(79, 195, 247, 0.08);
+  border: 1px solid rgba(79, 195, 247, 0.25);
+  color: #b0bec5;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.cat-btn:hover, .cat-btn.active {
+  background: rgba(79, 195, 247, 0.2);
+  border-color: #4fc3f7;
+  color: #4fc3f7;
+}
+
+/* 키보드 안내 */
+.keyboard-hint {
+  position: fixed; bottom: 20px; right: 20px;
+  background: rgba(13, 27, 48, 0.95);
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  padding: 10px 16px; border-radius: 8px;
+  font-size: 11px; color: #b0bec5;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+}
+.keyboard-hint kbd {
+  background: rgba(79, 195, 247, 0.2); color: #4fc3f7;
+  padding: 2px 8px; border-radius: 4px;
+  font-family: monospace; font-size: 10px;
+  margin: 0 2px;
+}
+
+@media (max-width: 1024px) {
+  .sidebar { width: 240px; }
+  .main { margin-left: 240px; width: calc(100% - 240px); max-width: calc(100% - 240px); }
+  .section { padding: 48px 32px; }
+}
+@media (max-width: 768px) {
+  .sidebar { width: 100%; height: auto; position: relative; }
+  .main { margin-left: 0; width: 100%; max-width: 100%; }
+  .layout { flex-direction: column; }
+  .cover h1 { font-size: 32px; }
+  .scenario-summary { grid-template-columns: 60px 1fr; }
+  .scenario-summary .ss-output { grid-column: 1 / -1; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-title">CONFIDENTIAL</div>
+    <div class="sidebar-subtitle">내부 보고용 · 상급자 대상<br>2026.05</div>
+
+    <div class="nav-section">핵심 요약</div>
+    <a class="nav-item" href="#cover"><span class="nav-num">00</span>표지 · 보고 요지</a>
+    <a class="nav-item" href="#exec"><span class="nav-num">01</span>Executive Summary</a>
+    <a class="nav-item" href="#situation"><span class="nav-num">02</span>상황 인식</a>
+
+    <div class="nav-section">방법론</div>
+    <a class="nav-item" href="#method"><span class="nav-num">03</span>방법론 개요</a>
+    <a class="nav-item" href="#scenarios"><span class="nav-num">04</span>4시나리오 요약</a>
+    <a class="nav-item" href="#integration"><span class="nav-num">05</span>통합 융합 체계</a>
+
+    <div class="nav-section">결정 사항</div>
+    <a class="nav-item" href="#recommendations"><span class="nav-num">06</span>핵심 권고 5가지</a>
+    <a class="nav-item" href="#timeline"><span class="nav-num">07</span>자원 · 일정</a>
+    <a class="nav-item" href="#risks"><span class="nav-num">08</span>위험 · 한계</a>
+
+    <div class="nav-section">신뢰성</div>
+    <a class="nav-item" href="#verification"><span class="nav-num">09</span>검증 신뢰성 (35건 정정)</a>
+
+    <div class="nav-section">부록</div>
+    <a class="nav-item" href="#glossary-section"><span class="nav-num">A1</span>📖 약어 사전</a>
+    <a class="nav-item" href="#references"><span class="nav-num">A2</span>참고문헌</a>
+  </aside>
+
+  <main class="main">
+
+    <!-- ============== §00 표지 ============== -->
+    <section class="cover" id="cover">
+      <div class="cover-badge">▣ 내부 보고 · 상급자 대상</div>
+      <h1>핵 에스컬레이션 단계 평가 방법론 — 운용 권고안</h1>
+      <p class="subtitle">
+        MOE/MOEI 기반 4단계(준비 → 고조 → 임박 → 명백) 판정 체계의 4시나리오 운용 방법론.
+        7개 전문 에이전트 병렬 정밀 검증을 거친 35건 정정 반영본.
+      </p>
+
+      <div class="cover-meta">
+        <div class="cover-meta-item">
+          <div class="label">보고 일자</div>
+          <div class="value">2026년 5월</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="label">보고 대상</div>
+          <div class="value">상급자 의사결정 지원</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="label">검증 신뢰도</div>
+          <div class="value">35건 정정 반영 (외부 검증 견딤)</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="label">결정 필요 항목</div>
+          <div class="value">5건 (§06 권고)</div>
+        </div>
+      </div>
+
+      <p style="margin-top: 60px; color: #b0bec5; font-size: 13px;">
+        ▣ 본 보고서의 모든 약어·기관명은 <strong style="color: #4fc3f7;">첫 등장 시 점선 밑줄</strong>로 표시되며, 마우스를 올리면 해설이 나타납니다. 전체 약어 목록은 <strong style="color: #4fc3f7;">§A1 약어 사전</strong>에서 검색·확인 가능합니다.
+      </p>
+    </section>
+
+    <!-- ============== §01 Executive Summary ============== -->
+    <section class="section" id="exec">
+      <h2><span class="sec-num">§01</span>Executive Summary</h2>
+
+      <div class="exec-summary">
+        <div class="exec-label">▣ 한 페이지 요약</div>
+        <h3>"러시아 BG 4단계 모델 채용 + 3중 검증 + 베이지안 위기 결심 + ISIS형 P(결심)×P(능력) 분해"</h3>
+
+        <div class="exec-bullet">
+          <strong>1. 우리 모델 ↔ 러시아 BG 1:1 대응</strong> — 우리 4단계 모델은 러시아 전투준비태세(Boyevaya Gotovnost, BG)와 정확히 1:1로 대응됨. 가장 직관적·검증된 벤치마크.
+        </div>
+        <div class="exec-bullet">
+          <strong>2. 4개 시나리오별 권고 방법론</strong> — (1) 실시간 감시: 임계값 자동 트리거 / (2) 주기 평가: SAT 구조화 분석 / (3) 위기 결심: 베이지안 동적 갱신 + RAND ROMANCER 시뮬레이션 / (4) 국제 벤치마크: IAEA·CTBTO·ISIS·FAS·CNS 방법론 참조.
+        </div>
+        <div class="exec-bullet">
+          <strong>3. 3중 검증 체계 권장</strong> — 정량 점수(자동) + 정성 검증(SAT) + 신뢰도 등급(ICD 203). 단일 방법론의 한계 보완.
+        </div>
+        <div class="exec-bullet">
+          <strong>4. 상급자 결정 필요 5건</strong> — MOEI 진단력 정량화 워크숍 / 적국별 임계값 차별화 / NC3 표기 표준화 / KIDA TTX 시행 / 자동화-인간 검토 균형. (§06 참조)
+        </div>
+        <div class="exec-bullet">
+          <strong>5. 자원 일정</strong> — 단기(3~6개월) 워크숍·임계값 설정 / 중기(6~12개월) TTX 시행·ROMANCER 도입 / 장기(12~24개월) 자동 알람 시스템·국제 협력. (§07 참조)
+        </div>
+        <div class="exec-bullet">
+          <strong>6. 검증 신뢰성</strong> — 본 보고서는 7개 Opus AI 에이전트 병렬 정밀 검증을 통해 35건의 오류·부정확을 모두 정정. <strong>외부 학술·정책 검증을 견딜 수 있는 신뢰성 확보</strong>. (§09 참조)
+        </div>
+      </div>
+
+      <h3>핵심 KPI</h3>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-num">4</div>
+          <div class="kpi-label">우리 모델 단계</div>
+          <div class="kpi-sub">준비/고조/임박/명백</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">33</div>
+          <div class="kpi-label">평가 지표</div>
+          <div class="kpi-sub">MOEI</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">4</div>
+          <div class="kpi-label">운용 시나리오</div>
+          <div class="kpi-sub">감시/평가/결심/벤치마크</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">3</div>
+          <div class="kpi-label">검증 단계</div>
+          <div class="kpi-sub">정량+정성+신뢰도</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">5</div>
+          <div class="kpi-label">결정 필요</div>
+          <div class="kpi-sub">상급자 권한</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-num">35</div>
+          <div class="kpi-label">검증 정정 반영</div>
+          <div class="kpi-sub">신뢰성 확보</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== §02 상황 인식 ============== -->
+    <section class="section" id="situation">
+      <h2><span class="sec-num">§02</span>상황 인식</h2>
+
+      <p class="lead">
+        주변국(특히 북한)의 핵 능력 진화와 위기 시 단계 판정의 정확성이 국가 안보에 직결됨. 기존 평가 체계는 정성 분석에 의존도가 높아 위기 시 분 단위 의사결정 지원에 한계가 있음. 본 보고는 4개 시나리오별 권고 방법론을 통해 평가 체계의 정량화·자동화·신뢰성 강화 방안을 제시함.
+      </p>
+
+      <h3>1. 현재 우리 평가 체계의 위치</h3>
+
+      <table>
+        <thead><tr><th style="width:25%">영역</th><th>현재 수준</th><th>목표 수준</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>실시간 감시</strong></td>
+            <td>분석관 수기 평가 위주</td>
+            <td>임계값 기반 자동 트리거 + 인간 검토 2단계</td>
+          </tr>
+          <tr>
+            <td><strong>주기 평가</strong></td>
+            <td>분기 보고서 (비구조화)</td>
+            <td>SAT(Indicators Validator/ACH/Key Assumptions Check/Red Hat) 구조화 + ICD 203 신뢰도 등급</td>
+          </tr>
+          <tr>
+            <td><strong>위기 결심 지원</strong></td>
+            <td>정성적 판단</td>
+            <td>Paté-Cornell 베이지안 동적 갱신 + RAND ROMANCER 시뮬레이션</td>
+          </tr>
+          <tr>
+            <td><strong>국제 벤치마크</strong></td>
+            <td>제한적 참조</td>
+            <td>IAEA · CTBTO · ISIS · FAS · CNS 방법론 체계적 차용</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>2. 외부 환경의 변화 (2025~2026)</h3>
+
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-tag">2025.06</span>
+          <div class="card-title">12-Day War (이란-이스라엘 전쟁)</div>
+          <div class="card-desc">2025.6.13 이스라엘 Operation Rising Lion 개시, 6.22 미국 이란 핵시설 공습, 6.24 휴전. ISIS Geiger Counter 방법론이 점수제 → 확률적 접근으로 전환된 직접 계기.</div>
+        </div>
+        <div class="card">
+          <span class="card-tag">2025.12</span>
+          <div class="card-title">RAND ROMANCER 공개</div>
+          <div class="card-desc">AFGSC A5/8 의뢰로 RAND가 핵 위기 에스컬레이션 평가 모델 ROMANCER 공개 (RR-A2673-1 이론서 + TL-A2673-2 사용 가이드). GitHub에 Python 코드 공개 (MIT License).</div>
+        </div>
+        <div class="card">
+          <span class="card-tag">2026.02</span>
+          <div class="card-title">ISIS 확률적 접근 채용</div>
+          <div class="card-desc">2026.2.20 ISIS가 Iran Threat Geiger Counter를 점수제(6단계) 폐기, P(결심) × P(성공) 분해 + Game Theory + Fault Tree Analysis 결합 확률적 접근 전면 도입.</div>
+        </div>
+        <div class="card">
+          <span class="card-tag">지속</span>
+          <div class="card-title">북한 미사일 기술 진화</div>
+          <div class="card-desc">2021.9 미사일 연료 앰풀(ampoule) 기술 + 2023 Hwasong-18 / 2024 Hwasong-19 고체연료 ICBM 도입 → 기존 "액체연료 급유 = 발사 임박" 추론의 진단력 시계열 감소.</div>
+        </div>
+      </div>
+
+      <p>위 4가지 변화로 인해 <strong>우리 평가 체계의 방법론 업데이트가 시급</strong>함.</p>
+    </section>
+
+    <!-- ============== §03 방법론 개요 ============== -->
+    <section class="section" id="method">
+      <h2><span class="sec-num">§03</span>방법론 개요</h2>
+
+      <h3>1. 우리 4단계 모델 ↔ 러시아 BG 1:1 대응</h3>
+
+      <table>
+        <thead><tr><th style="width:20%">우리 모델</th><th style="width:25%">러시아 BG</th><th>작전적 의미</th></tr></thead>
+        <tbody>
+          <tr><td>1단계 핵 준비</td><td><strong>CONSTANT</strong> (Постоянная)</td><td>평시 상시 태세, 부대 영구 주둔지 집중, 일상 활동</td></tr>
+          <tr><td>2단계 고조</td><td><strong>ELEVATED</strong> (Повышенная)</td><td>단기 대응 가능 상태, 장비·물자 점검, 동원 준비</td></tr>
+          <tr><td>3단계 임박</td><td><strong>MILITARY DANGER</strong> (Военная опасность)</td><td>장비 예비 지역으로 이전, 알람 발령 대기</td></tr>
+          <tr><td>4단계 명백</td><td><strong>FULL</strong> (Полная)</td><td>최대 태세, 즉시 발사 가능, Kazbek 자동 명령통제 시스템이 standby → combat mode 전환</td></tr>
+        </tbody>
+      </table>
+
+      <div class="correction-box">
+        <span class="corr-label">▣ 정정</span>
+        FULL 단계 = "핵 가방 활성화"라는 통설은 <strong>오류</strong>. 러시아 핵 가방(Cheget)은 1985년부터 대통령·국방장관·총참모총장이 BG 단계와 <strong>무관하게 상시 휴대</strong>. FULL 단계에서 활성화되는 것은 <strong>Kazbek 자동 명령통제 시스템 전체가 standby → combat mode로 전환</strong>되는 것임.
+      </div>
+
+      <h3>2. 4개 운용 시나리오 통합 모델</h3>
+
+      <pre>┌─────────────────────────────────────────────────────────────────┐
+│            핵 에스컬레이션 단계 평가 통합 프레임워크            │
+├─────────────────────────────────────────────────────────────────┤
+│  [시나리오 1]  →  [시나리오 2]  →  [시나리오 3]                 │
+│  실시간 감시      분기 평가         위기 결심                   │
+│       │                │                │                       │
+│       ▼                ▼                ▼                       │
+│       ╔══════════════════════════════════════════╗              │
+│       ║   통합 단계 판정 + 신뢰도 등급           ║              │
+│       ║ (정량 점수 + 정성 검증 + 베이지안 확률)  ║              │
+│       ╚══════════════════════════════════════════╝              │
+│                       ▲                                         │
+│                       │                                         │
+│              [시나리오 4 검증]                                  │
+│              (국제기구 벤치마크)                                │
+└─────────────────────────────────────────────────────────────────┘</pre>
+    </section>
+
+    <!-- ============== §04 4시나리오 요약 ============== -->
+    <section class="section" id="scenarios">
+      <h2><span class="sec-num">§04</span>4시나리오 운용 방법론 요약</h2>
+
+      <!-- 시나리오 1 -->
+      <div class="scenario-summary">
+        <div class="ss-num">1</div>
+        <div class="ss-body">
+          <div class="ss-title">실시간 상시 감시</div>
+          <div class="ss-method">방법: 임계값 기반 자동 트리거 + 다지표 가중합</div>
+          <div class="ss-desc">
+            33개 MOEI 각각의 측정값에 단계별 임계값을 설정. 임계값 위반 개수에 진단력 가중치를 곱해 단계 점수 산출. 다중 단계 신호 충돌 시 상위 단계 우선·NC3 결정적 신호(D↔F, C 결심) 가중. 자동 알람 → 인간 분석가 검토 → 격상 결정 2단계 필수.
+            <br><br>
+            <strong>벤치마크</strong>: 미국 DEFCON / 한미 WATCHCON / 한국 진돗개 / 러시아 BG
+          </div>
+        </div>
+        <div class="ss-output">
+          <div class="ss-output-label">▣ 출력</div>
+          <div class="ss-output-val">
+            단계 알람 + 신뢰도<br><br>
+            <strong style="color: #ffb74d;">예시</strong>: TEL 약 30% 이상 기지 밖 이동 → 2단계 트리거 (예시 가정값)
+          </div>
+        </div>
+      </div>
+
+      <!-- 시나리오 2 -->
+      <div class="scenario-summary">
+        <div class="ss-num">2</div>
+        <div class="ss-body">
+          <div class="ss-title">주기적 전문가 평가 (분기별)</div>
+          <div class="ss-method">방법: SAT 기반 구조화 분석 + Indicators Validator + ACH + Key Assumptions Check + Red Hat Analysis</div>
+          <div class="ss-desc">
+            Heuer & Pherson(2010)의 50개 SAT 기법 중 4개 채용. Indicators Validator로 33개 MOEI의 진단력 매트릭스 구축. ACH로 4개 단계 가설을 체계적으로 비교(비일치가 가장 적은 가설이 최우선 — Heuer 원칙). 기만 작전 가능성 점검(Grabo, 2002).
+            <br><br>
+            <strong>신뢰도 등급</strong>: ICD 203(ODNI, 2015) High/Moderate/Low Confidence + WEPs 표준 7개 표현
+          </div>
+        </div>
+        <div class="ss-output">
+          <div class="ss-output-label">▣ 출력</div>
+          <div class="ss-output-val">
+            분기 평가 보고서<br><br>
+            <strong style="color: #ffb74d;">예시</strong>: "Moderate Confidence — It is likely that adversary transitioned to Stage 2"
+          </div>
+        </div>
+      </div>
+
+      <!-- 시나리오 3 -->
+      <div class="scenario-summary">
+        <div class="ss-num">3</div>
+        <div class="ss-body">
+          <div class="ss-title">위기 시 의사결정 지원</div>
+          <div class="ss-method">방법: 베이지안 동적 갱신 + RAND ROMANCER 시뮬레이션 + CSIS 1.5-sided TTX</div>
+          <div class="ss-desc">
+            Paté-Cornell & Fischbeck(1995)의 다중 가설 베이지안 공식으로 신호 관측마다 단계 사후확률 P(H_k|E)를 실시간 갱신. Blum & Paté-Cornell(2016) Pearl Harbor 모델 4요소(신호 관측·시간 외삽·결정권자 선호·리드 타임) 반영. RAND ROMANCER(RR-A2673-1, 2025.12.16)의 4가지 출력 패턴 중 "Dissimilar Escalation Ladders" 시나리오 식별 필수.
+            <br><br>
+            <strong>TTX 검증</strong>: CSIS Futures Lab Algorithmic Stability(2024.6.10) Corcyra 워게임의 1.5-sided design 채용 + CSIS PONI(2020) 8회×150명 규모 참조
+          </div>
+        </div>
+        <div class="ss-output">
+          <div class="ss-output-label">▣ 출력</div>
+          <div class="ss-output-val">
+            P(단계|관측) + 권장 행동<br><br>
+            <strong style="color: #ffb74d;">예시</strong>: TEL 분산 + 액체연료 급유 관측 → P(H_2) ≈ 77% → 2단계 판정 (Moderate)
+          </div>
+        </div>
+      </div>
+
+      <!-- 시나리오 4 -->
+      <div class="scenario-summary">
+        <div class="ss-num">4</div>
+        <div class="ss-body">
+          <div class="ss-title">국제기구 벤치마크</div>
+          <div class="ss-method">방법: 확률적 점수제 + Fault Tree Analysis</div>
+          <div class="ss-desc">
+            (a) IAEA SIR 2022(GOV/2023/25): 단계화된 결론(declared → all nuclear material → broader conclusion) 차용.
+            (b) CTBTO IDC: 5단계 카테고리(Cat 5 → 16개 인증 실험실 중 2개 자동 송부, 7일 분석) → 결정적 트리거 MOEI 발생 시 사전 지정 2~3개 자산 우선 송부 구조 권장.
+            (c) ISIS Geiger Counter(2026.2.20): P(결심)×P(성공) 분해 적용.
+            (d) FAS Nuclear Notebook(1987~) + CNS NK Missile DB(1984~): 시계열 추세 추적.
+          </div>
+        </div>
+        <div class="ss-output">
+          <div class="ss-output-label">▣ 출력</div>
+          <div class="ss-output-val">
+            단계 라벨 + 시간 추정<br><br>
+            <strong style="color: #ffb74d;">예시</strong>: "장기 5~6개월 시나리오, P=34~42%"
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== §05 통합 융합 ============== -->
+    <section class="section" id="integration">
+      <h2><span class="sec-num">§05</span>통합 융합 체계 — 3중 검증</h2>
+
+      <p class="lead">모든 단계 판정은 다음 3중 검증을 거침. 단일 방법론의 한계 보완.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-tag">1차 · 시나리오 1</span>
+          <div class="card-title">정량 점수 (자동)</div>
+          <div class="card-desc">
+            MOEI별 임계값 기반 단계 점수 산출, 단계당 가중 합산.<br><br>
+            <strong>출력</strong>: 단계 1~4 점수 + 잠정 최고 점수 단계
+          </div>
+        </div>
+        <div class="card">
+          <span class="card-tag">2차 · 시나리오 2</span>
+          <div class="card-title">정성 검증 (SAT)</div>
+          <div class="card-desc">
+            Indicators Validator로 MOEI 진단력 재확인, ACH로 경쟁 가설 비교, Key Assumptions Check, Red Hat Analysis.<br><br>
+            <strong>출력</strong>: 1차 결과 확인/수정 + 대안 가설 명시
+          </div>
+        </div>
+        <div class="card">
+          <span class="card-tag">3차 · ICD 203</span>
+          <div class="card-title">신뢰도 등급</div>
+          <div class="card-desc">
+            High/Moderate/Low Confidence + WEPs 7개 표준 표현(almost no chance ~ almost certainly). 표준어/대체어 혼합 금지.<br><br>
+            <strong>출력</strong>: 최종 판정 + 신뢰도 + 권장 행동
+          </div>
+        </div>
+      </div>
+
+      <h3>단계 전환 임계값 + 권장 행동</h3>
+
+      <table>
+        <thead><tr><th>평가 단계</th><th>신뢰도</th><th>권장 행동</th></tr></thead>
+        <tbody>
+          <tr><td>1단계</td><td>High</td><td>정상 운용, 분기 평가 지속</td></tr>
+          <tr><td>1→2 전환 의심</td><td>Low</td><td>추가 정보 수집, 차주 재평가</td></tr>
+          <tr><td>1→2 전환 의심</td><td>Moderate</td><td>정보 자산 우선순위 재조정, 동맹국 협의 개시</td></tr>
+          <tr><td><strong>2단계</strong></td><td><strong>High</strong></td><td><strong>WATCHCON 격상 검토, 외교 채널 가동</strong></td></tr>
+          <tr><td>2→3 전환 의심</td><td>Moderate</td><td>정보 자산 집중 투입, 비상 회의</td></tr>
+          <tr><td><strong>3단계</strong></td><td><strong>High</strong></td><td><strong>DEFCON/Boyevaya Gotovnost 격상 권고, 동맹 협의</strong></td></tr>
+          <tr><td><strong>4단계</strong></td><td><strong>Any</strong></td><td><strong>즉각 보복 태세, 핵 결심 절차</strong></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ============== §06 핵심 권고 ============== -->
+    <section class="section" id="recommendations">
+      <h2><span class="sec-num">§06</span>핵심 권고 5가지 (상급자 결정 필요)</h2>
+
+      <p class="lead">아래 5건은 상급자 결정이 필요한 사항입니다. 각 권고에 <strong style="color: #ef9a9a;">▶ 결정 요청 사항</strong>이 명시되어 있습니다.</p>
+
+      <div class="recommendation">
+        <div><span class="rec-num">1</span><h4>러시아 BG 4단계 모델 정식 채용</h4></div>
+        <div class="rec-detail">우리 모델과 1:1 대응되는 가장 직관적·검증된 벤치마크. FULL 단계는 "핵 가방 활성화"가 아닌 "Kazbek 시스템 standby→combat mode 전환"으로 정확히 정의. 정식 채용 시 KIDA 표준 문서 및 합참·국정원 공유 자료 일괄 갱신 필요.</div>
+        <div class="rec-decision"><strong>▶ 결정 요청</strong>: BG 4단계 모델을 우리 평가 체계의 공식 벤치마크로 채택 승인.</div>
+      </div>
+
+      <div class="recommendation">
+        <div><span class="rec-num">2</span><h4>3중 검증 체계 운용 의무화</h4></div>
+        <div class="rec-detail">정량(자동) + 정성(SAT) + 신뢰도(ICD 203)의 3중 검증. 단일 분석관 판단 또는 단일 알고리즘 출력으로 단계 판정 불허. 분기 평가 보고서 및 위기 평가 모두에 적용.</div>
+        <div class="rec-decision"><strong>▶ 결정 요청</strong>: 3중 검증 절차의 KIDA 내부 운용 의무화 및 분석관 교육 일정 승인.</div>
+      </div>
+
+      <div class="recommendation">
+        <div><span class="rec-num">3</span><h4>MOEI 진단력 정량화 워크숍 시행</h4></div>
+        <div class="rec-detail">Indicators Validator를 KIDA 내부 전문가 5~10인 패널로 시행, 33개 MOEI 진단력 매트릭스 완성. 적국별(북·중·러) 차등 가중치 산출. 북한 미사일 기술 진화(ampoule, 고체연료 ICBM)에 따른 MOEI 2.2.2 진단력 재평가 포함.</div>
+        <div class="rec-decision"><strong>▶ 결정 요청</strong>: 워크숍 예산·일정(3~6개월) 및 외부 전문가 참여 범위 승인.</div>
+      </div>
+
+      <div class="recommendation">
+        <div><span class="rec-num">4</span><h4>KIDA TTX 시행 (1.5-sided design)</h4></div>
+        <div class="rec-detail">CSIS Futures Lab Atalan et al.(2024)의 1.5-sided design 방식 + CSIS PONI(2020)의 8회×2시나리오×150명 모델 결합. KIDA 내부 2~3회 시행으로 단계 판단 실전 검증. ROMANCER GitHub 코드(MIT License) 활용 시뮬레이션 환경 구축 병행.</div>
+        <div class="rec-decision"><strong>▶ 결정 요청</strong>: TTX 시행 규모(파일럿 vs 정식), 참여 분석관 범위, 6~12개월 일정 승인.</div>
+      </div>
+
+      <div class="recommendation">
+        <div><span class="rec-num">5</span><h4>자동 알람 → 인간 검토 2단계 구조 표준화</h4></div>
+        <div class="rec-detail">1962 쿠바위기 우발적 알람, 1983 Stanislav Petrov 사례 등 자동 시스템의 거짓 양성을 인간이 차단한 다수 사례. 그러나 위기 시 분 단위 의사결정에서 인간 검토는 지연 야기. <strong>1·2단계 전환은 인간 검토 의무화, 3→4단계는 자동화 비중 증가, 4단계 결정적 신호는 즉시 보고 + 동시 검토</strong> 구조 권장.</div>
+        <div class="rec-decision"><strong>▶ 결정 요청</strong>: 단계별 자동화-인간 검토 비율 표준 채택 및 거짓 양성/음성 위험 선호도 사전 합의.</div>
+      </div>
+    </section>
+
+    <!-- ============== §07 자원 · 일정 ============== -->
+    <section class="section" id="timeline">
+      <h2><span class="sec-num">§07</span>자원 · 일정</h2>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-period">단기 (3~6개월)</div>
+          <div class="timeline-title">정량화 + 임계값 설정 단계</div>
+          <div class="timeline-desc">
+            ① <strong>MOEI 진단력 정량화 워크숍</strong>: Indicators Validator로 33개 MOEI 진단력 매트릭스 완성. 내부 전문가 5~10인 패널.<br>
+            ② <strong>적국별 임계값 사전 설정</strong>: 북·중·러별 MOEI별 단계 임계값 초안 작성. 북한 ampoule + 고체연료 반영.<br>
+            ③ <strong>베이지안 확률 모델 구축</strong>: P(MOEI 신호|단계) 조건부 확률 추정.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-period">중기 (6~12개월)</div>
+          <div class="timeline-title">TTX + ROMANCER + 데이터베이스</div>
+          <div class="timeline-desc">
+            ④ <strong>TTX 시행</strong>: 1.5-sided design + 8회×150명 모델 결합. KIDA 내부 2~3회.<br>
+            ⑤ <strong>ROMANCER 도입 검토</strong>: GitHub MIT License 활용. Hotline 2-player 데모 기반 한반도 NCA 양국 모델.<br>
+            ⑥ <strong>북한 미사일 데이터베이스 재구성</strong>: CNS NK Missile DB(Cotton, 1984~) 기반 MOEI 기준 재구성.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-period">장기 (12~24개월)</div>
+          <div class="timeline-title">자동화 + 시계열 분석 + 국제 협력</div>
+          <div class="timeline-desc">
+            ⑦ <strong>자동 알람 시스템 프로토타입</strong>: 시나리오 1 임계값 기반 자동 단계 판정. CTBTO IDC 카테고리 5 → 2개 인증 실험실 송부 + 7일 분석 모델 참조.<br>
+            ⑧ <strong>시계열 추세 분석</strong>: FAS Nuclear Notebook 방식 다년 추세 추적.<br>
+            ⑨ <strong>국제 협력</strong>: NTI Nuclear Security Index 한국 데이터 제공, 국제 학계 방법론 교류.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== §08 위험 · 한계 ============== -->
+    <section class="section" id="risks">
+      <h2><span class="sec-num">§08</span>위험 · 한계</h2>
+
+      <p class="lead">본 보고서는 다음 한계를 솔직히 명시함. 권고안 운용 시 반드시 고려.</p>
+
+      <div class="risk-box">
+        <div class="risk-label">▣ 한계 1 · 검증 불가 표기</div>
+        <h4>NC3 표기(D↔F, C 결심)는 KIDA 내부 분류 체계</h4>
+        <p>본 보고서가 사용하는 NC3 functional state 표기는 STRATCOM·CRS·Nautilus Institute의 공개 표준과 정확히 일치하지 않음. 외부 협력·국제 학계 교류 시 의사소통 장애 가능. <strong>표준화 권고 필요(§06 권고 외 추가 검토 필요)</strong>.</p>
+      </div>
+
+      <div class="risk-box">
+        <div class="risk-label">▣ 한계 2 · 예시 가정값</div>
+        <h4>TEL 30%/70% 등 임계값은 본 보고서 예시 가정값</h4>
+        <p>공개 학술 문헌에 통용되는 표준 임계값이 아님. 실제 운용 시 정보분석관 패널 검증·시계열 누적·적국별 특성 분석을 통해 <strong>재설정 필수</strong>. §06 권고 3(워크숍)으로 해결.</p>
+      </div>
+
+      <div class="risk-box">
+        <div class="risk-label">▣ 한계 3 · 진단력 감소 추세</div>
+        <h4>북한 미사일 기술 진화에 따른 MOEI 2.2.2 진단력 감소</h4>
+        <p>2021.9 ampoule 추진제 도입과 2023~24 고체연료 ICBM(Hwasong-18/19) 비중 증가로 "액체연료 급유 = 발사 임박" 추론의 진단력이 시계열로 감소. <strong>분기별 가중치 재조정 필요</strong>.</p>
+      </div>
+
+      <div class="risk-box">
+        <div class="risk-label">▣ 한계 4 · MASINT 운영적 제약</div>
+        <h4>MASINT 탄두 결합 탐지는 이론 가능, 실무 제한적</h4>
+        <p>핵탄두 방사선 시그니처는 차폐·격납으로 외부 탐지 매우 제한. <strong>인접 지상 센서·잠입 장비 등 보조 INT와 결합 시에만 실효적</strong>. MOEI 3.1.2를 "결정적 트리거"로 분류 시 이 운영 한계 반영 필수.</p>
+      </div>
+
+      <div class="risk-box">
+        <div class="risk-label">▣ 한계 5 · 인간 검토 지연</div>
+        <h4>자동 알람-인간 검토 2단계 구조의 위기 시 지연 위험</h4>
+        <p>2→3단계 전환은 수 시간~며칠(탄두 호송), 3→4단계는 분~시간 단위(발사 결심) 리드 타임. 인간 검토 시간이 임계 시간을 초과할 위험. <strong>단계별 자동화 비율 차등화로 해결 권장(§06 권고 5)</strong>.</p>
+      </div>
+    </section>
+
+    <!-- ============== §09 검증 신뢰성 ============== -->
+    <section class="section" id="verification">
+      <h2><span class="sec-num">§09</span>검증 신뢰성 — 35건 정정 반영</h2>
+
+      <p class="lead">
+        본 보고서는 2026년 5월 <strong>7개 Opus AI 에이전트 병렬 정밀 검증</strong>을 통해 35건의 오류·부정확을 식별·정정하여 반영했습니다. 외부 학술·정책 검증을 견딜 수 있는 신뢰성을 확보했습니다.
+      </p>
+
+      <h3>1. 검증 방법론</h3>
+
+      <table>
+        <thead><tr><th>검증 영역</th><th>전문 에이전트 역할</th></tr></thead>
+        <tbody>
+          <tr><td>IAEA · CTBTO</td><td>SIR 2022 통계, IMS·IDC 절차, 카테고리 분류 정확도</td></tr>
+          <tr><td>ISIS Geiger Counter</td><td>보고서 본문, 5명 저자 풀네임, 방법론 변천 시점, 모든 확률 수치</td></tr>
+          <tr><td>RAND ROMANCER</td><td>보고서 번호, 6인 저자 풀네임, AFGSC 의뢰, GitHub, 4가지 출력 패턴</td></tr>
+          <tr><td>핵 태세 체계</td><td>러시아 BG·Cheget, DEFCON, WATCHCON 180항목, 진돗개 발령</td></tr>
+          <tr><td>학술 인용</td><td>Heuer 기법 수, Paté-Cornell 논문, ICD 203 WEP 7개, CSIS PONI/Corcyra</td></tr>
+          <tr><td>역사적 사건</td><td>푸틴 2.27, 쿠바/욤키푸르/9.11, Petrov, 이란-이스라엘 2025.6</td></tr>
+          <tr><td>기술 개념</td><td>NC2/NC3, Acton entanglement, 베이지안 공식, MASINT/TEL/액체연료</td></tr>
+        </tbody>
+      </table>
+
+      <h3>2. 정정 사항 분류 (총 35건)</h3>
+
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-num">10</div><div class="kpi-label">메타데이터 정정</div><div class="kpi-sub">저자·연도·번호·DOI</div></div>
+        <div class="kpi-card"><div class="kpi-num">9</div><div class="kpi-label">내용 정정</div><div class="kpi-sub">사실·수치·정의</div></div>
+        <div class="kpi-card"><div class="kpi-num">7</div><div class="kpi-label">출처·한계 명시</div><div class="kpi-sub">검증 불가 표기</div></div>
+        <div class="kpi-card"><div class="kpi-num">9</div><div class="kpi-label">표현 정밀화·보강</div><div class="kpi-sub">맥락 추가</div></div>
+      </div>
+
+      <h3>3. 주요 정정 사항 (상위 10건)</h3>
+
+      <table>
+        <thead><tr><th style="width:30%">항목</th><th>정정 전 → 정정 후</th></tr></thead>
+        <tbody>
+          <tr><td><strong>RAND ROMANCER 번호</strong></td><td>TL-A2673-1 → <strong>RR-A2673-1</strong>(이론서) + <strong>TL-A2673-2</strong>(User Guide)</td></tr>
+          <tr><td><strong>RAND ROMANCER 6인 저자</strong></td><td>이니셜만 표기 → <strong>Dahlia Anne Goldfeld, Gary J. Briggs, Nancy Huerta, Jim Mignano, Nina Miller</strong> 등 풀네임 확정</td></tr>
+          <tr><td><strong>Blum & Paté-Cornell 연도</strong></td><td>(2018) → <strong>(2016)</strong> Decision Analysis 13(1):1-25, DOI 10.1287/deca.2015.0321</td></tr>
+          <tr><td><strong>러시아 핵 가방</strong></td><td>FULL 단계 활성화 → <strong>1985년부터 상시 휴대, Kazbek 시스템 standby→combat mode 전환</strong></td></tr>
+          <tr><td><strong>ROMANCER 출력 패턴</strong></td><td>5가지 → <strong>4가지</strong> (Freeze-Leaning은 amygdala archetype 이름과 혼동)</td></tr>
+          <tr><td><strong>CSIS 출처 혼동</strong></td><td>PONI URL에 Algorithmic Stability 내용 합쳐짐 → <strong>두 출처 명확히 분리</strong></td></tr>
+          <tr><td><strong>CTBTO 카테고리 5 송부</strong></td><td>16개 전체 → <strong>16개 중 2개</strong></td></tr>
+          <tr><td><strong>IAEA AP 보유국</strong></td><td>136 → <strong>134</strong> (SIR 2023과 혼동)</td></tr>
+          <tr><td><strong>ICD 203 WEPs</strong></td><td>remote / even chance / probably → <strong>almost no chance / roughly even chance / likely</strong> (표준어)</td></tr>
+          <tr><td><strong>Heuer 1판 기법 수</strong></td><td>55개 → <strong>50개</strong> (55개는 2014년 2판)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="correction-box" style="margin-top: 24px;">
+        <span class="corr-label">▣ 신뢰성 의미</span>
+        본 정정은 단순 메타데이터 교정에 그치지 않고, <strong>분석 논리에 영향을 미치는 사항(러시아 Cheget, ROMANCER 패턴 수, CSIS 출처 혼동, CTBTO 카테고리 5 절차 등)</strong>까지 모두 반영. 정정 후 분석 논리는 무손실(오히려 강화)됨이 확인됨.
+      </div>
+    </section>
+
+    <!-- ============== §A1 약어 사전 ============== -->
+    <section class="section" id="glossary-section">
+      <h2><span class="sec-num">A1</span>📖 약어 사전 (Glossary)</h2>
+
+      <p class="lead">본 보고서에 등장하는 모든 전문 약어와 기관명을 검색·필터링할 수 있습니다. 본문에서 <strong style="color: #4fc3f7;">점선 밑줄</strong>로 표시된 약어는 첫 등장 시 자동으로 툴팁이 표시됩니다.</p>
+
+      <input type="text" class="glossary-search" id="glossarySearch" placeholder="🔍 약어 또는 한국어로 검색 (예: NC3, 베이지안, IAEA)">
+
+      <div class="glossary-cat-filter" id="catFilter">
+        <button class="cat-btn active" data-cat="all">전체</button>
+        <button class="cat-btn" data-cat="태세">핵 태세</button>
+        <button class="cat-btn" data-cat="정보">정보·INT</button>
+        <button class="cat-btn" data-cat="분석">분석 방법</button>
+        <button class="cat-btn" data-cat="기관">국제 기관·NGO</button>
+        <button class="cat-btn" data-cat="기술">기술·미사일</button>
+        <button class="cat-btn" data-cat="학술">학자·문헌</button>
+        <button class="cat-btn" data-cat="사건">역사적 사건</button>
+      </div>
+
+      <table class="glossary-table" id="glossaryTable">
+        <thead><tr><th>약어</th><th>정식 명칭</th><th>해설</th><th>분류</th></tr></thead>
+        <tbody>
+          <!-- 핵 태세 체계 -->
+          <tr><td class="term-abbr">MOE</td><td class="term-full">Measure of Effectiveness</td><td class="term-meaning">작전·체계가 목적을 얼마나 달성했는지 평가하는 기준. 한국어 "효과척도".</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">MOEI</td><td class="term-full">Measure of Effectiveness Indicator</td><td class="term-meaning">MOE에 대한 통찰을 제공하는 데이터 포인트. 한국어 "효과척도지표". 본 보고서는 33개 MOEI 체계 사용.</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">DEFCON</td><td class="term-full">Defense Readiness Condition</td><td class="term-meaning">미군 방위태세. 5단계(평시 5 → 핵전 1). 1959년 11월 JCS 메모로 정의. 1962 SAC DEFCON 2, 1973·2001 DEFCON 3 격상.</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">WATCHCON</td><td class="term-full">Watch Condition</td><td class="term-meaning">한미 정보 태세. 4단계(평시 4 → 전시 1). 약 180개 비정상 북한 군 활동 항목 감시. 1992·1996·2015 격상.</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">진돗개</td><td class="term-full">Jindogae (Korean Local Alert)</td><td class="term-meaning">한국군 국지 도발 대응 경계태세. 3단계(셋·둘·하나). 발령 지역 한정. 군 내부 정식 표기는 "진도개". 2010 연평도·2014 연천·2015 서부전선 모두 "진돗개 하나" 발령.</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">BG</td><td class="term-full">Boyevaya Gotovnost (Боевая готовность)</td><td class="term-meaning">러시아 전투준비태세. 4단계(CONSTANT/ELEVATED/MILITARY DANGER/FULL). 우리 4단계 모델과 1:1 대응.</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">Cheget</td><td class="term-full">Чегет (Russian Nuclear Briefcase)</td><td class="term-meaning">러시아 핵 가방. Kazbek 시스템의 휴대형 단말. 1985년 도입, 대통령·국방장관·총참모총장이 BG 단계와 무관하게 상시 휴대(Service K 부대 장교 수행).</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">Kazbek</td><td class="term-full">Russian Automatic Command and Control System</td><td class="term-meaning">러시아 핵 자동 명령통제 시스템. 1985년 도입. BG FULL 단계에서 standby → combat mode 전환.</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">NC2</td><td class="term-full">Nuclear Command and Control</td><td class="term-meaning">핵 지휘통제. 좁은 의미로 대통령 권한과 지휘선만 지칭. 통신 인프라는 NC3에 포함.</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">NC3</td><td class="term-full">Nuclear Command, Control, and Communications</td><td class="term-meaning">핵 지휘통제통신. 현대 미국 STRATCOM·CRS 표준. NC2 + 통신 인프라.</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">CJCS</td><td class="term-full">Chairman of the Joint Chiefs of Staff</td><td class="term-meaning">미 합참의장. 1986 Goldwater-Nichols Act 이후 작전 명령권 없음(자문·전달 역할).</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">NMCC</td><td class="term-full">National Military Command Center</td><td class="term-meaning">미 국가군사지휘센터. 펜타곤 내. DEFCON 명령을 사령부에 전파하는 기술적 채널.</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">STRATCOM</td><td class="term-full">United States Strategic Command</td><td class="term-meaning">미 전략사령부. 2018년 Mattis NC3 governance review로 NC3의 단일 운영 사령관으로 지정.</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">SAC</td><td class="term-full">Strategic Air Command</td><td class="term-meaning">미 전략공군사령부 (1946~1992). 1962 쿠바위기 시 DEFCON 2 격상한 유일 사례.</td><td class="term-cat">태세</td></tr>
+          <tr><td class="term-abbr">AFGSC</td><td class="term-full">Air Force Global Strike Command</td><td class="term-meaning">미 공군 전략타격사령부. RAND ROMANCER 보고서 의뢰 기관(A5/8 부서).</td><td class="term-cat">태세</td></tr>
+
+          <!-- 정보·INT -->
+          <tr><td class="term-abbr">IMINT</td><td class="term-full">Imagery Intelligence</td><td class="term-meaning">영상정보. 위성·항공 사진 등.</td><td class="term-cat">정보</td></tr>
+          <tr><td class="term-abbr">SIGINT</td><td class="term-full">Signals Intelligence</td><td class="term-meaning">신호정보. 통신·전자 신호 가로채기.</td><td class="term-cat">정보</td></tr>
+          <tr><td class="term-abbr">MASINT</td><td class="term-full">Measurement and Signature Intelligence</td><td class="term-meaning">계측·신호분석정보. 6개 하위 분야(Nuclear MASINT 포함). 탄두 결합 시 방사선 시그니처 탐지는 이론 가능하나 실무 제한적.</td><td class="term-cat">정보</td></tr>
+          <tr><td class="term-abbr">ELINT</td><td class="term-full">Electronic Intelligence</td><td class="term-meaning">전자정보. 레이더·전자 시스템 신호 분석. SIGINT의 하위 분야.</td><td class="term-cat">정보</td></tr>
+          <tr><td class="term-abbr">I&W List</td><td class="term-full">Indication and Warning List</td><td class="term-meaning">한미 정보당국이 감시하는 비정상 북한 군 활동 약 180개 항목 목록. 항목 내역은 기밀.</td><td class="term-cat">정보</td></tr>
+          <tr><td class="term-abbr">ISR</td><td class="term-full">Intelligence, Surveillance, and Reconnaissance</td><td class="term-meaning">정보·감시·정찰. 통합 정보 수집 활동.</td><td class="term-cat">정보</td></tr>
+
+          <!-- 분석 방법 -->
+          <tr><td class="term-abbr">SAT</td><td class="term-full">Structured Analytic Techniques</td><td class="term-meaning">구조화 분석기법. Heuer & Pherson (2010) 50개 기법(2판 55개, 3판 66개). 정보 분석의 인지 편향 극복용.</td><td class="term-cat">분석</td></tr>
+          <tr><td class="term-abbr">ACH</td><td class="term-full">Analysis of Competing Hypotheses</td><td class="term-meaning">경쟁가설 분석. Heuer 핵심 기법. 비일치(I)가 가장 적은 가설이 최우선(단순 일치 수 기반보다 견고).</td><td class="term-cat">분석</td></tr>
+          <tr><td class="term-abbr">Indicators Validator</td><td class="term-full">Heuer & Pherson Diagnosticity Validator</td><td class="term-meaning">지표 진단력 검증. 행=지표/열=가설 매트릭스. Heuer 원본은 H/M/L 정성 분류, 본 보고서는 1~5 척도로 변형.</td><td class="term-cat">분석</td></tr>
+          <tr><td class="term-abbr">Red Hat</td><td class="term-full">Red Hat Analysis</td><td class="term-meaning">적색팀 분석. 적국 시각에서 동일 상황 재해석.</td><td class="term-cat">분석</td></tr>
+          <tr><td class="term-abbr">ICD 203</td><td class="term-full">Intelligence Community Directive 203 — Analytic Standards</td><td class="term-meaning">미 정보공동체 분석 표준. ODNI 2015.1.2 서명. High/Moderate/Low Confidence + WEPs 7개 표준 표현.</td><td class="term-cat">분석</td></tr>
+          <tr><td class="term-abbr">WEPs</td><td class="term-full">Words of Estimative Probability</td><td class="term-meaning">확률 추정 표현. ICD 203 표준 7개: almost no chance / very unlikely / unlikely / roughly even chance / likely / very likely / almost certainly. 표준어/대체어 혼합 금지.</td><td class="term-cat">분석</td></tr>
+          <tr><td class="term-abbr">ODNI</td><td class="term-full">Office of the Director of National Intelligence</td><td class="term-meaning">미 국가정보장실. ICD 203 발행 기관.</td><td class="term-cat">분석</td></tr>
+          <tr><td class="term-abbr">Bayes' theorem</td><td class="term-full">Bayes' Theorem (Bayesian Updating)</td><td class="term-meaning">베이지안 정리. 신호 관측 시 사후 확률을 갱신하는 수학적 방법. 다중 가설 형태: P(H_k|E) = [P(E|H_k)×P(H_k)] / Σ_j [P(E|H_j)×P(H_j)].</td><td class="term-cat">분석</td></tr>
+          <tr><td class="term-abbr">Fault Tree</td><td class="term-full">Fault Tree Analysis</td><td class="term-meaning">결함수 분석. 사건의 조건들을 AND/OR logic gates로 결합해 확률 산출. ISIS Geiger Counter P(성공) 평가에 사용.</td><td class="term-cat">분석</td></tr>
+          <tr><td class="term-abbr">Game Theory</td><td class="term-full">Game Theory</td><td class="term-meaning">게임이론. 다자 상호작용 모델. ISIS Geiger Counter P(결심) 평가에 사용.</td><td class="term-cat">분석</td></tr>
+          <tr><td class="term-abbr">TTX</td><td class="term-full">Tabletop Exercise</td><td class="term-meaning">탁상 훈련. 시나리오 기반 의사결정 시뮬레이션.</td><td class="term-cat">분석</td></tr>
+          <tr><td class="term-abbr">1.5-sided design</td><td class="term-full">1.5-sided Wargame Design</td><td class="term-meaning">워게임 설계 방식. 적측(Red) 행동은 사전 결정해두고, 아군(Blue) 플레이어 반응 데이터를 수집. CSIS Futures Lab Atalan et al.(2024) Corcyra 워게임에서 사용된 표현.</td><td class="term-cat">분석</td></tr>
+
+          <!-- 국제 기관 · NGO -->
+          <tr><td class="term-abbr">IAEA</td><td class="term-full">International Atomic Energy Agency</td><td class="term-meaning">국제원자력기구. 비엔나 본부. 핵 안전조치(safeguards) 적용. SIR(Safeguards Implementation Report) 매년 발간.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">SIR</td><td class="term-full">Safeguards Implementation Report</td><td class="term-meaning">IAEA 안전조치 이행 보고서. SIR 2022(GOV/2023/25, 2023.6.12 발간): 188개국 평가, 134개국 AP 발효, 74개국 broader conclusion.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">CSA</td><td class="term-full">Comprehensive Safeguards Agreement</td><td class="term-meaning">IAEA 포괄 안전조치 협정. 2022년 말 180개국 보유.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">AP</td><td class="term-full">Additional Protocol</td><td class="term-meaning">IAEA 추가의정서. CSA 강화. 미신고 핵물질·활동 검증 가능. 2022년 말 134개국 발효.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">Broader Conclusion</td><td class="term-full">IAEA Broader Conclusion</td><td class="term-meaning">IAEA 확장 결론. "all nuclear material remained in peaceful activities" = 선언된 핵물질 비전용 + 미신고 핵물질·활동 부재. 2022년 74개국 도달.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">CTBTO</td><td class="term-full">Comprehensive Nuclear-Test-Ban Treaty Organization</td><td class="term-meaning">포괄적 핵실험금지조약기구. 비엔나 본부. 핵실험 탐지 IMS 운용.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">IDC</td><td class="term-full">International Data Centre</td><td class="term-meaning">CTBTO 국제데이터센터. IMS의 4개 기술(지진파/수중음향/극저주파/방사성핵종) 데이터 처리.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">IMS</td><td class="term-full">International Monitoring System</td><td class="term-meaning">CTBTO 국제감시체계. 89개국 321개 관측소 + 16개 인증 실험실.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">ISIS</td><td class="term-full">Institute for Science and International Security</td><td class="term-meaning">과학·국제안보연구소. David Albright 설립. Iran Threat Geiger Counter 발간. <strong>주의: 테러조직 ISIS(IS)와 무관</strong>.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">FAS</td><td class="term-full">Federation of American Scientists</td><td class="term-meaning">미국과학자연맹. Hans Kristensen 디렉터. Nuclear Notebook(1987~) 발간.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">SIPRI</td><td class="term-full">Stockholm International Peace Research Institute</td><td class="term-meaning">스톡홀름 국제평화연구소. SIPRI Yearbook 매년 발간. Kristensen이 2001년부터 "World Nuclear Forces" 챕터 공저.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">NTI</td><td class="term-full">Nuclear Threat Initiative</td><td class="term-meaning">핵위협이니셔티브. NTI Nuclear Security Index 발간(2023 6판). Economist Impact와 공동.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">CNS</td><td class="term-full">James Martin Center for Nonproliferation Studies</td><td class="term-meaning">제임스 마틴 비확산연구센터. Middlebury Institute of International Studies. NK Missile Test Database 운용(Shea Cotton 작성).</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">RAND</td><td class="term-full">RAND Corporation</td><td class="term-meaning">미 RAND 연구소. 1948년 설립. ROMANCER(2025.12.16) 등 핵 정책 연구.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">CSIS</td><td class="term-full">Center for Strategic and International Studies</td><td class="term-meaning">미 전략국제문제연구소. PONI(Project on Nuclear Issues), Futures Lab 산하.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">PONI</td><td class="term-full">Project on Nuclear Issues (CSIS)</td><td class="term-meaning">CSIS 핵 이슈 프로젝트. Under the Nuclear Shadow TTX 시리즈(2020): 8회×2시나리오×150명.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">Futures Lab</td><td class="term-full">CSIS Futures Lab</td><td class="term-meaning">CSIS 산하. Benjamin Jensen senior fellow. Algorithmic Stability(2024.6.10) Corcyra 워게임 수행.</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">JMIC</td><td class="term-full">Joint Military Intelligence College</td><td class="term-meaning">미 합동군사정보대학. Grabo(2002) Anticipating Surprise 발행 상위 기관(직접 발행은 산하 Center for Strategic Intelligence Research).</td><td class="term-cat">기관</td></tr>
+          <tr><td class="term-abbr">KIDA</td><td class="term-full">Korea Institute for Defense Analyses</td><td class="term-meaning">한국국방연구원. 1979년 설립. 본 보고서의 33개 MOEI 체계 기반.</td><td class="term-cat">기관</td></tr>
+
+          <!-- 기술·미사일 -->
+          <tr><td class="term-abbr">TEL</td><td class="term-full">Transporter-Erector-Launcher</td><td class="term-meaning">수송-기립-발사기. 미사일 통합 차량 시스템. 위치 변동·탄두 결합이 단계 판정 핵심 지표.</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">ICBM</td><td class="term-full">Intercontinental Ballistic Missile</td><td class="term-meaning">대륙간 탄도미사일. 사거리 5,500km 이상.</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">SLBM</td><td class="term-full">Submarine-Launched Ballistic Missile</td><td class="term-meaning">잠수함 발사 탄도미사일.</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">HEU</td><td class="term-full">Highly Enriched Uranium</td><td class="term-meaning">고농축 우라늄. U-235 농축도 20% 이상(무기급은 90% 이상).</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">WGU</td><td class="term-full">Weapons-Grade Uranium</td><td class="term-meaning">무기급 우라늄. 일반적으로 U-235 90% 이상 농축.</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">SWU</td><td class="term-full">Separative Work Unit</td><td class="term-meaning">분리작업단위. 우라늄 농축 능력 측정 단위. ISIS Iran 시나리오에 25,000 SWU/년 농축 가정.</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">ampoule</td><td class="term-full">Missile Fuel Ampoule</td><td class="term-meaning">미사일 연료 앰풀. 공장 사전 충전 sealed canister 방식. 북한이 2021.9 김정은 공식 발표로 도입. 액체연료 미사일의 장기 fuelled 상태 유지 가능.</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">Hwasong-17</td><td class="term-full">Hwasong-17 (화성-17)</td><td class="term-meaning">북한 액체연료 ICBM. 대형. 사전 급유 후 이동 불가, 현장 급유 필수.</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">Hwasong-18</td><td class="term-full">Hwasong-18 (화성-18)</td><td class="term-meaning">북한 고체연료 ICBM. 2023년 도입. 액체연료 의존도 감소의 시작.</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">Hwasong-19</td><td class="term-full">Hwasong-19 (화성-19)</td><td class="term-meaning">북한 고체연료 ICBM. 2024년 도입.</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">MTCR</td><td class="term-full">Missile Technology Control Regime</td><td class="term-meaning">미사일기술통제체제. Category I = 500kg payload + 300km range 이상. CNS NK Missile DB가 의도적으로 동일 기준 채택.</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">Entanglement</td><td class="term-full">Acton's Entanglement Concept</td><td class="term-meaning">James M. Acton(Carnegie)이 정립한 개념·메커니즘(시설 아님). 핵 C3I 자산이 비핵 작전에 dual-use로 사용되며 의도치 않은 핵 에스컬레이션 위험 야기.</td><td class="term-cat">기술</td></tr>
+          <tr><td class="term-abbr">ROMANCER</td><td class="term-full">RAND Ontological Model for Assessing Nuclear Crisis Escalation Risk</td><td class="term-meaning">RAND 핵 위기 에스컬레이션 평가 ontological 모델. Python agent-based simulation framework. GitHub MIT License 공개. 4가지 출력 패턴 정의.</td><td class="term-cat">기술</td></tr>
+
+          <!-- 학자·문헌 -->
+          <tr><td class="term-abbr">Heuer</td><td class="term-full">Richards J. Heuer Jr.</td><td class="term-meaning">CIA 분석관 출신. Psychology of Intelligence Analysis 저자. Structured Analytic Techniques(2010~) 공저.</td><td class="term-cat">학술</td></tr>
+          <tr><td class="term-abbr">Pherson</td><td class="term-full">Randolph H. Pherson</td><td class="term-meaning">전 CIA. Heuer와 SAT 공저. Pherson Associates 설립.</td><td class="term-cat">학술</td></tr>
+          <tr><td class="term-abbr">Jervis</td><td class="term-full">Robert Jervis (1940-2021)</td><td class="term-meaning">Columbia University 교수. Perception and Misperception in International Politics(1976) 저자. 합리적 행위자 가정 비판의 권위자.</td><td class="term-cat">학술</td></tr>
+          <tr><td class="term-abbr">Kahn</td><td class="term-full">Herman Kahn</td><td class="term-meaning">RAND·Hudson Institute. On Escalation: Metaphors and Scenarios(1965) 저자. 에스컬레이션 사다리 메타포 원조. ROMANCER 이론 기반.</td><td class="term-cat">학술</td></tr>
+          <tr><td class="term-abbr">Schelling</td><td class="term-full">Thomas C. Schelling</td><td class="term-meaning">2005 노벨 경제학상. commitment·signaling 이론. 핵 억제 게임이론 권위자.</td><td class="term-cat">학술</td></tr>
+          <tr><td class="term-abbr">Grabo</td><td class="term-full">Cynthia M. Grabo</td><td class="term-meaning">전 DIA. Anticipating Surprise(2002) 저자. 전략적 경고 분석의 고전. 기만 작전(Ch.7) 강조.</td><td class="term-cat">학술</td></tr>
+          <tr><td class="term-abbr">Paté-Cornell</td><td class="term-full">M. Elisabeth Paté-Cornell</td><td class="term-meaning">Stanford 교수. 위험 공학·베이지안 응용 권위자. (1995) C3 신호 베이지안 갱신 + (2016) Pearl Harbor 재해석.</td><td class="term-cat">학술</td></tr>
+          <tr><td class="term-abbr">Albright</td><td class="term-full">David Albright</td><td class="term-meaning">ISIS 설립자·소장. 전 IAEA 사찰관. Iran Threat Geiger Counter 주저자.</td><td class="term-cat">학술</td></tr>
+          <tr><td class="term-abbr">Kristensen</td><td class="term-full">Hans M. Kristensen</td><td class="term-meaning">FAS Nuclear Information Project 디렉터. Nuclear Notebook(1987~) 공저. SIPRI Yearbook 공저(2001~).</td><td class="term-cat">학술</td></tl>
+          <tr><td class="term-abbr">DOI</td><td class="term-full">Digital Object Identifier</td><td class="term-meaning">디지털 객체 식별자. 학술 논문 영구 식별 코드. 예: 10.1287/deca.2015.0321.</td><td class="term-cat">학술</td></tr>
+          <tr><td class="term-abbr">ISBN</td><td class="term-full">International Standard Book Number</td><td class="term-meaning">국제 표준 도서번호.</td><td class="term-cat">학술</td></tr>
+          <tr><td class="term-abbr">MIT License</td><td class="term-full">MIT License</td><td class="term-meaning">매사추세츠공대 라이선스. 가장 허용적인 오픈소스 라이선스 중 하나. ROMANCER 코드 라이선스.</td><td class="term-cat">학술</td></tr>
+
+          <!-- 역사적 사건 -->
+          <tr><td class="term-abbr">Pearl Harbor</td><td class="term-full">Pearl Harbor Attack (1941.12.7)</td><td class="term-meaning">진주만 공격. 일본 함대의 무선 침묵("dog that didn't bark") 신호가 사전 경고 가능했음을 Blum & Paté-Cornell(2016) 베이지안 동적 추론으로 재분석.</td><td class="term-cat">사건</td></tr>
+          <tr><td class="term-abbr">Stanislav Petrov</td><td class="term-full">Stanislav Yevgrafovich Petrov (1939-2017)</td><td class="term-meaning">소련군 중령. 1983.9.26 00:15 Serpukhov-15 벙커. Oko 위성 5개 미사일 거짓 양성 신호를 false alarm으로 분류 보고하여 핵전쟁 위기 방지.</td><td class="term-cat">사건</td></tr>
+          <tr><td class="term-abbr">Cuban Missile Crisis</td><td class="term-full">Cuban Missile Crisis (1962.10)</td><td class="term-meaning">쿠바 미사일 위기. 1962.10.22 미군 DEFCON 3, 10.24 SAC DEFCON 2(~11.15). SAC의 DEFCON 2 도달 유일 사례.</td><td class="term-cat">사건</td></tr>
+          <tr><td class="term-abbr">Yom Kippur War</td><td class="term-full">Yom Kippur War (1973.10)</td><td class="term-meaning">제4차 중동전쟁. 1973.10.24 야간 ~ 25 새벽 Kissinger 주재 NSC가 DEFCON 3 결정(닉슨 부재). 사유: 소련의 이집트 제3군 구출용 군사 개입 위협.</td><td class="term-cat">사건</td></tr>
+          <tr><td class="term-abbr">9/11</td><td class="term-full">September 11 Attacks (2001.9.11)</td><td class="term-meaning">9.11 테러. 2001.9.11 약 10:00~10:45 EST Rumsfeld 국방장관 DEFCON 3 명령, DEFCON 2 격상도 "stand-by". 9.14 DEFCON 4 복귀.</td><td class="term-cat">사건</td></tr>
+          <tr><td class="term-abbr">12-Day War</td><td class="term-full">Twelve-Day War (2025.6.13~24)</td><td class="term-meaning">이란-이스라엘 전쟁. 이스라엘 Operation Rising Lion으로 6.13 개시, 미국 6.22 핵시설 공습, 6.24 트럼프 휴전 발표. ISIS Geiger Counter 방법론 전환 직접 계기.</td><td class="term-cat">사건</td></tr>
+          <tr><td class="term-abbr">Operation Rising Lion</td><td class="term-full">Operation Rising Lion (이스라엘 작전명)</td><td class="term-meaning">이스라엘이 2025.6.13 03:00경 개시한 이란 핵시설·지도부 공습 작전.</td><td class="term-cat">사건</td></tr>
+          <tr><td class="term-abbr">Corcyra</td><td class="term-full">Corcyra Wargame</td><td class="term-meaning">CSIS Futures Lab Atalan et al.(2024.6.10) 워게임 명칭. 가상 3국(Green/Purple/Orange) × 3라운드(경쟁 → 군사 충돌 초기). 1.5-sided design 채용.</td><td class="term-cat">사건</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ============== §A2 참고문헌 ============== -->
+    <section class="section" id="references">
+      <h2><span class="sec-num">A2</span>참고문헌</h2>
+
+      <h3>학술 인용</h3>
+      <div class="citation">
+        Heuer, Richards J. Jr., &amp; Pherson, Randolph H. (2010년 3월 16일). <em>Structured Analytic Techniques for Intelligence Analysis</em> (1판, 50개 기법). CQ Press. ISBN 9781608710188.
+      </div>
+      <div class="citation">
+        Paté-Cornell, M. Elisabeth, &amp; Fischbeck, Paul S. (1995). "Probabilistic Interpretation of Command and Control Signals: Bayesian Updating of the Probability of Nuclear Attack." <em>Reliability Engineering and System Safety</em>, 47(1):27-36. ScienceDirect PII: 095183209400037O.
+      </div>
+      <div class="citation">
+        Blum, David M., &amp; Paté-Cornell, M. Elisabeth. (<strong>2016년 3월</strong>). "Probabilistic Warnings in National Security Crises: Pearl Harbor Revisited." <em>Decision Analysis</em>, <strong>13(1):1-25</strong>. DOI: <strong>10.1287/deca.2015.0321</strong>. arXiv 사전인쇄본: arXiv:1802.04887 (2018.02).
+      </div>
+      <div class="citation">
+        Geist, Edward, Goldfeld, Dahlia Anne, Briggs, Gary J., Huerta, Nancy, Mignano, Jim, &amp; Miller, Nina. (2025년 12월 16일). <em>The RAND Ontological Model for Assessing Nuclear Crisis Escalation Risk (ROMANCER): Theoretical Introduction and Background</em>. RAND Corporation, RR-A2673-1, 54페이지. DOI: 10.7249/RRA2673-1. 의뢰: AFGSC A5/8.
+      </div>
+      <div class="citation">
+        Mignano, Jim, Briggs, Gary J., Huerta, Nancy, Geist, Edward, &amp; Goldfeld, Dahlia Anne. (2025). <em>ROMANCER: User Guide for Version 1.0</em>. RAND Corporation, TL-A2673-2. 소스 코드: https://github.com/RANDCorporation/ROMANCER (MIT License, Python 100%)
+      </div>
+      <div class="citation">
+        Office of the Director of National Intelligence (ODNI). (2015년 1월 2일). <em>Intelligence Community Directive 203: Analytic Standards</em>.
+      </div>
+      <div class="citation">
+        Grabo, Cynthia M. (편집자 Jan Goldman; 서문 Lt Gen James A. Williams). (2002). <em>Anticipating Surprise: Analysis for Strategic Warning</em>. <strong>Center for Strategic Intelligence Research, Joint Military Intelligence College</strong>. ISBN 0965619567.
+      </div>
+      <div class="citation">
+        Jervis, Robert. (1976). <em>Perception and Misperception in International Politics</em>. Princeton University Press.
+      </div>
+      <div class="citation">
+        Kahn, Herman. (1965). <em>On Escalation: Metaphors and Scenarios</em>. Praeger.
+      </div>
+      <div class="citation">
+        Acton, James M. (2018). "Escalation through Entanglement: How the Vulnerability of Command-and-Control Systems Raises the Risks of an Inadvertent Nuclear War." <em>International Security</em>, 43(1):56-99. MIT Press.
+      </div>
+
+      <h3>국제 기관 / NGO</h3>
+      <div class="citation">
+        IAEA. (2023년 6월 12일). <em>The Safeguards Implementation Report for 2022</em> (SIR 2022). 문서번호 GOV/2023/25. URL: iaea.org/newscenter/news/iaea-draws-safeguards-conclusions-for-188-states-safeguards-implementation-report-2022
+      </div>
+      <div class="citation">
+        CTBTO. <em>Radionuclide Data Processing and Analysis</em>. URL: ctbto.org/our-work/international-data-centre/radionuclide-data-processing-and-analysis
+      </div>
+      <div class="citation">
+        Albright, David, Burkhard, Sarah, Bitaraf, Maliheh, Faragasso, Spencer, &amp; Giveh, Mohammadreza. (2026년 2월 20일). <em>Iran Threat Geiger Counter: A Probabilistic Approach; What is the probability that Iran will build nuclear weapons?</em> Institute for Science and International Security (ISIS).
+      </div>
+      <div class="citation">
+        Kristensen, Hans M., Korda, Matt, Johns, Eliana, &amp; Knight, Mackenzie. (1987.5~현재, 격월). <em>Nuclear Notebook</em>. <em>Bulletin of the Atomic Scientists</em>. FAS Nuclear Information Project. SIPRI Yearbook "World Nuclear Forces" 공저 (Kristensen, 2001~).
+      </div>
+      <div class="citation">
+        Cotton, Shea. <em>The CNS North Korea Missile Test Database</em>. James Martin Center for Nonproliferation Studies (CNS). NTI 호스팅. 1984.4~. 기준: 500kg payload + 300km range 이상 (MTCR Category I 임계치).
+      </div>
+      <div class="citation">
+        NTI &amp; Economist Impact. (2023년 7월 18일, 6판). <em>NTI Nuclear Security Index</em>. URL: ntiindex.org
+      </div>
+
+      <h3>워게임 · TTX</h3>
+      <div class="citation">
+        CSIS Project on Nuclear Issues (PONI). (2020년 4월 10일). "Tabletop Exercise Takeaways." <em>On the Radar</em>. URL: ontheradar.csis.org/analysis/tabletop-exercise-takeaways/
+      </div>
+      <div class="citation">
+        Atalan, Yasir, Jensen, Benjamin, &amp; Macias III, Jose M. (<strong>2024년 6월 10일</strong>). <em>Algorithmic Stability: How AI Could Shape the Future of Deterrence</em>. CSIS Futures Lab. 워게임: Corcyra. 설계: 1.5-sided design.
+      </div>
+
+      <h3>운용 체계 · 역사</h3>
+      <div class="citation">
+        GlobalSecurity.org. <em>Russia Combat Readiness (Boyevaya Gotovnost)</em>. URL: globalsecurity.org/wmd/world/russia/combat-readiness.htm
+      </div>
+      <div class="citation">
+        Alperovitch, Dmitri. (2022년 2월 27일). X 게시물 ID 1497952720841584647. (러시아 핵 태세 4단계 분류 추정 1차 출처)
+      </div>
+      <div class="citation">
+        GlobalSecurity.org. <em>Watch Condition (WATCHCON) / USFK WATCHCON</em>. URL: globalsecurity.org/military/agency/dod/usfk-watchcon.htm
+      </div>
+
+      <h3>본 보고의 기반 문서</h3>
+      <div class="citation">
+        <strong>핵에스컬레이션_평가방법론_수정본.md</strong> (2026년 5월). 35건 정밀 검증 정정 반영. 7개 Opus AI 에이전트 병렬 검증.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- 키보드 안내 -->
+<div class="keyboard-hint">
+  <kbd>↑</kbd><kbd>↓</kbd> 섹션 이동 · <kbd>/</kbd> 약어 검색
+</div>
+
+<script>
+// ============== 네비게이션 ==============
+const sections = document.querySelectorAll('section.section, section.cover');
+const navItems = document.querySelectorAll('.nav-item');
+
+function getCurrentSectionIndex() {
+  const scrollY = window.scrollY + 100;
+  let current = 0;
+  sections.forEach((sec, i) => {
+    if (sec.offsetTop <= scrollY) current = i;
+  });
+  return current;
+}
+
+document.addEventListener('keydown', (e) => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea') return;
+
+  const current = getCurrentSectionIndex();
+  if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+    e.preventDefault();
+    const next = Math.min(current + 1, sections.length - 1);
+    sections[next].scrollIntoView({ behavior: 'smooth' });
+  } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+    e.preventDefault();
+    const prev = Math.max(current - 1, 0);
+    sections[prev].scrollIntoView({ behavior: 'smooth' });
+  } else if (e.key === 'Home') {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else if (e.key === '/') {
+    e.preventDefault();
+    const search = document.getElementById('glossarySearch');
+    if (search) {
+      document.getElementById('glossary-section').scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => search.focus(), 500);
+    }
+  }
+});
+
+function updateActiveNav() {
+  const current = getCurrentSectionIndex();
+  navItems.forEach(item => item.classList.remove('active'));
+  const targetId = sections[current].id;
+  const activeNav = document.querySelector(`.nav-item[href="#${targetId}"]`);
+  if (activeNav) activeNav.classList.add('active');
+}
+
+window.addEventListener('scroll', updateActiveNav);
+
+navItems.forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    const targetId = item.getAttribute('href');
+    const target = document.querySelector(targetId);
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// ============== 약어 사전 검색 + 필터 ==============
+(function setupGlossaryFilter() {
+  const search = document.getElementById('glossarySearch');
+  const catBtns = document.querySelectorAll('.cat-btn');
+  const rows = document.querySelectorAll('#glossaryTable tbody tr');
+
+  let currentCat = 'all';
+  let currentQuery = '';
+
+  function applyFilter() {
+    rows.forEach(row => {
+      const abbr = row.querySelector('.term-abbr')?.textContent.toLowerCase() || '';
+      const full = row.querySelector('.term-full')?.textContent.toLowerCase() || '';
+      const meaning = row.querySelector('.term-meaning')?.textContent.toLowerCase() || '';
+      const cat = row.querySelector('.term-cat')?.textContent.trim() || '';
+      const matchCat = currentCat === 'all' || cat === currentCat;
+      const matchQ = !currentQuery || abbr.includes(currentQuery) || full.includes(currentQuery) || meaning.includes(currentQuery);
+      row.style.display = (matchCat && matchQ) ? '' : 'none';
+    });
+  }
+
+  search.addEventListener('input', e => {
+    currentQuery = e.target.value.toLowerCase().trim();
+    applyFilter();
+  });
+
+  catBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      catBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCat = btn.dataset.cat;
+      applyFilter();
+    });
+  });
+})();
+
+// ============== 약어 첫 등장 자동 wrapping ==============
+(function autoWrapFirstOccurrences() {
+  const glossaryTable = document.getElementById('glossaryTable');
+  if (!glossaryTable) return;
+
+  const abbrMap = new Map();
+  glossaryTable.querySelectorAll('tbody tr').forEach(row => {
+    const abbrCell = row.querySelector('.term-abbr');
+    const fullCell = row.querySelector('.term-full');
+    const meaningCell = row.querySelector('.term-meaning');
+    if (!abbrCell) return;
+    const abbrText = abbrCell.textContent.trim();
+    const fullText = fullCell ? fullCell.textContent.trim() : '';
+    const meaningText = meaningCell ? meaningCell.textContent.trim() : '';
+    if (!abbrText) return;
+    const tooltipText = fullText && meaningText
+      ? fullText + ' — ' + meaningText
+      : (fullText || meaningText);
+    if (abbrText && !abbrMap.has(abbrText)) abbrMap.set(abbrText, tooltipText);
+  });
+  if (abbrMap.size === 0) return;
+
+  const matched = new Set();
+  const terms = [...abbrMap.keys()].sort((a, b) => b.length - a.length);
+  const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(terms.map(escapeRegex).join('|'), 'g');
+  const isWordChar = c => /[A-Za-z0-9_]/.test(c);
+
+  const glossarySection = document.getElementById('glossary-section');
+  const sidebar = document.querySelector('.sidebar');
+  const root = document.body;
+
+  const textNodes = [];
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (!node.nodeValue) return NodeFilter.FILTER_REJECT;
+      let p = node.parentNode;
+      while (p && p !== root) {
+        if (p.nodeType === 1) {
+          if (p === glossarySection || p === sidebar) return NodeFilter.FILTER_REJECT;
+          const tag = p.tagName;
+          if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return NodeFilter.FILTER_REJECT;
+          if (tag === 'ABBR' && p.classList.contains('term')) return NodeFilter.FILTER_REJECT;
+        }
+        p = p.parentNode;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  let n;
+  while ((n = walker.nextNode())) textNodes.push(n);
+
+  for (const node of textNodes) {
+    if (matched.size >= abbrMap.size) break;
+    const text = node.nodeValue;
+    regex.lastIndex = 0;
+    const seenInNode = new Set();
+    const localMatches = [];
+    let m;
+    while ((m = regex.exec(text)) !== null) {
+      const term = m[0];
+      if (matched.has(term) || seenInNode.has(term)) continue;
+      const start = m.index;
+      const end = start + term.length;
+      const before = start > 0 ? text[start - 1] : '';
+      const after = end < text.length ? text[end] : '';
+      if (isWordChar(term[0]) && isWordChar(before)) continue;
+      if (isWordChar(term[term.length - 1]) && isWordChar(after)) continue;
+      localMatches.push({ start, end, term });
+      seenInNode.add(term);
+    }
+    if (localMatches.length === 0) continue;
+
+    localMatches.sort((a, b) => a.start - b.start);
+    const nonOverlap = [];
+    for (const mm of localMatches) {
+      if (nonOverlap.length === 0 || mm.start >= nonOverlap[nonOverlap.length - 1].end) {
+        nonOverlap.push(mm);
+      }
+    }
+    nonOverlap.forEach(mm => matched.add(mm.term));
+
+    const frag = document.createDocumentFragment();
+    let cursor = 0;
+    for (const mm of nonOverlap) {
+      if (mm.start > cursor) {
+        frag.appendChild(document.createTextNode(text.substring(cursor, mm.start)));
+      }
+      const abbr = document.createElement('abbr');
+      abbr.className = 'term';
+      abbr.setAttribute('data-full', abbrMap.get(mm.term));
+      abbr.textContent = mm.term;
+      frag.appendChild(abbr);
+      cursor = mm.end;
+    }
+    if (cursor < text.length) {
+      frag.appendChild(document.createTextNode(text.substring(cursor)));
+    }
+    node.parentNode.replaceChild(frag, node);
+  }
+})();
+
+// ============== 동적 툴팁 (body attach + 위치 안정화) ==============
+(function setupAbbrTooltips() {
+  let tooltipEl = null;
+  let currentAbbr = null;
+
+  function positionTooltip(abbr) {
+    if (!tooltipEl) return;
+    const rect = abbr.getBoundingClientRect();
+    tooltipEl.style.top = '0px';
+    tooltipEl.style.left = '0px';
+    const tooltipRect = tooltipEl.getBoundingClientRect();
+
+    let top = rect.top - tooltipRect.height - 12;
+    let left = rect.left + rect.width / 2 - tooltipRect.width / 2;
+    const margin = 10;
+    if (left < margin) left = margin;
+    if (left + tooltipRect.width > window.innerWidth - margin) {
+      left = window.innerWidth - tooltipRect.width - margin;
+    }
+    if (top < margin) {
+      top = rect.bottom + 12;
+      tooltipEl.classList.add('below');
+    } else {
+      tooltipEl.classList.remove('below');
+    }
+    tooltipEl.style.top = top + 'px';
+    tooltipEl.style.left = left + 'px';
+  }
+
+  function showTooltip(abbr) {
+    const text = abbr.getAttribute('data-full');
+    if (!text) return;
+    if (tooltipEl) tooltipEl.remove();
+    tooltipEl = document.createElement('div');
+    tooltipEl.className = 'abbr-tooltip';
+    tooltipEl.textContent = text;
+    tooltipEl.style.setProperty('position', 'fixed', 'important');
+    tooltipEl.style.setProperty('z-index', '99999', 'important');
+    document.body.appendChild(tooltipEl);
+    positionTooltip(abbr);
+    requestAnimationFrame(() => {
+      if (tooltipEl) {
+        positionTooltip(abbr);
+        tooltipEl.classList.add('visible');
+      }
+    });
+    currentAbbr = abbr;
+  }
+
+  function hideTooltip() {
+    if (tooltipEl) { tooltipEl.remove(); tooltipEl = null; }
+    currentAbbr = null;
+  }
+
+  document.addEventListener('mouseover', e => {
+    const abbr = e.target.closest('abbr.term');
+    if (abbr && abbr !== currentAbbr) showTooltip(abbr);
+  });
+  document.addEventListener('mouseout', e => {
+    const abbr = e.target.closest('abbr.term');
+    if (abbr) {
+      const related = e.relatedTarget;
+      if (!related || (!related.closest('.abbr-tooltip') && related.closest('abbr.term') !== abbr)) {
+        hideTooltip();
+      }
+    }
+  });
+  window.addEventListener('scroll', () => { if (currentAbbr) positionTooltip(currentAbbr); }, { passive: true });
+  window.addEventListener('resize', () => { if (currentAbbr) positionTooltip(currentAbbr); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hideTooltip(); });
+})();
+
+updateActiveNav();
+</script>
+
+</body>
+</html>
