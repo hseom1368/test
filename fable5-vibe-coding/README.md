@@ -14,6 +14,12 @@ Fable 5(2026-06-09 출시) 직후 공개된 **바이브 코딩 사례**를 모�
 - **`prompts/case13_mvmt_email_prompt.txt`** — 이커머스 이메일 목업 프롬프트 전문
 - **`preview_contact_sheet.png`** — 6개 GIF 한눈에 보기
 
+- **`comparisons/`** — ⭐ **Fable 5 vs 이전 모델(Opus 4.8) 동일 프롬프트 비교**
+  - `side-by-side/` — 좌우 라벨 비교 GIF 3종 (버튼 run1/run2, Win95)
+  - `originals/` — 저자 원본 GIF 7종
+  - `COMPARISON.md` — 프롬프트·결과표·실패 사례·다른 비교 사례 링크
+  - 출처: [yukurash/fable5-vs-opus48-arena](https://github.com/yukurash/fable5-vs-opus48-arena)
+
 ## 핵심 제약 (꼭 확인)
 원본 바이럴 데모 대부분은 X/YouTube에 있고, 이 작업 환경은 GitHub만 허용해 그 영상은 **직접 추출 불가**였습니다.
 그래서 GIF 6개는 **코드가 GitHub에 공개된 동일 데모를 재실행해 만든 화면**입니다. 그 외 사례는 `CATALOG.md`의 원본 링크에서 직접 캡처하세요. 자세한 내용은 `CATALOG.md` 상단 참고.
